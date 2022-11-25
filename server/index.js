@@ -1,10 +1,14 @@
 
 const express = require('express')
 const bodyParser = require('body-parser');
-const cors = require('cors')
+const cors = require('cors');
+const mongoose = require('mongoose');
 
 const app = express()
 const port = 3001
+
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -22,7 +26,15 @@ app.use((req, res, next) => {
     next();
 });
 
-
+const MongoDBConnection = async () => {
+    try {
+        await mongoose.connect('mongodb+srv://user-1:H5pAeXho9Xldj9cf@cluster0.radnh.mongodb.net/?retryWrites=true&w=majority');
+        console.log("database connect")
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+MongoDBConnection()
 app.get('/', (req, res) => {
     try {
         res.send('Hello World!')
@@ -35,6 +47,29 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+
+// _________________MODELS_______________//
+// ____________COURSE_______________//
+
+
+const courseSchema = new Schema({
+    id: ObjectId,
+    title: { type: String },
+});
+const CourseModal = mongoose.model('course', courseSchema);
+
+// ____________COURSE_______________//
+
+//______________________MANAGER___________________//
+
+const managerSchema = new Schema({
+    id: ObjectId,
+    title: { type: String },
+});
+const ManagerModal = mongoose.model('manager', managerSchema);
+//______________________MANAGER___________________//
+// _________________MODELS_______________//
 
 //____________________________//
 //_____________AUTH  START_______________//
@@ -103,10 +138,11 @@ app.get('/managers', (req, res) => {
     }
 })
 
-app.post('/managers', (req, res) => {
+app.post('/managers', async (req, res) => {
     try {
-        res.send('Hello World!')
-
+        const manager = new ManagerModal;
+        const newManager = await manager.save({ ...req.body })
+        res.status(200).send(newManager)
     } catch (error) {
         res.status().send()
     }
@@ -130,7 +166,7 @@ app.delete('/managers', (req, res) => {
     }
 })
 
-app.delete('/accept/managers', (req, res) => {
+app.post('/accept/managers', (req, res) => {
     try {
         res.send('Hello World!')
 
@@ -139,7 +175,7 @@ app.delete('/accept/managers', (req, res) => {
     }
 })
 
-app.delete('/reject/managers', (req, res) => {
+app.post('/reject/managers', (req, res) => {
     try {
         res.send('Hello World!')
 
@@ -161,9 +197,15 @@ app.get('/courses', (req, res) => {
     }
 })
 
-app.post('/courses', (req, res) => {
+app.post('/courses', async (req, res) => {
     try {
-        res.send('Hello World!')
+        try {
+            const course = new CourseModal;
+            const newCourse = await course.save({ ...req.body })
+            res.status(200).send(newCourse)
+        } catch (error) {
+            console.log(error)
+        }
 
     } catch (error) {
         res.status().send()
@@ -210,3 +252,4 @@ app.delete('/reject/courses', (req, res) => {
 
 //_____________ADMIN END_______________//
 //____________________________//
+

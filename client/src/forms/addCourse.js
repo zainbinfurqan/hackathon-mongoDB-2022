@@ -3,7 +3,12 @@ import Button from '../components/button';
 
 function AddCourse(props) {
 
-    const handleAdd = () => { }
+    const handleAdd = async () => {
+        await fetch('http://localhost:3001/courses',
+            {
+                method: 'POST', body: JSON.stringify({})
+            })
+    }
 
     return (
         <div>
