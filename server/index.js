@@ -24,7 +24,12 @@ app.use((req, res, next) => {
 
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.listen(port, () => {
@@ -35,15 +40,30 @@ app.listen(port, () => {
 //_____________AUTH  START_______________//
 
 app.get('/login', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.get('/signup', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.get('/guest/login', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 //_____________AUTH  END_______________//
@@ -53,7 +73,12 @@ app.get('/guest/login', (req, res) => {
 //____________________________//
 
 app.get('/search', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 //_____________SEARCH END_______________//
@@ -65,27 +90,62 @@ app.get('/search', (req, res) => {
 //____________MANAGER________________//
 
 app.get('/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        try {
+            res.send('Hello World!')
+
+        } catch (error) {
+            res.status().send()
+        }
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.post('/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.put('/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/accept/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/reject/managers', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 
@@ -93,27 +153,57 @@ app.delete('/reject/managers', (req, res) => {
 //____________COURSE________________//
 
 app.get('/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.post('/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.put('/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/accept/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 app.delete('/reject/courses', (req, res) => {
-    res.send('Hello World!')
+    try {
+        res.send('Hello World!')
+
+    } catch (error) {
+        res.status().send()
+    }
 })
 
 //____________COURSE________________//
