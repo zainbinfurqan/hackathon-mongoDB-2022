@@ -203,8 +203,17 @@ app.post('/request/to/make/managers', async (req, res) => {
 
 app.post('/accept/managers', (req, res) => {
     try {
-        res.send('Hello World!')
-
+        await UserModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { isManager: true },
+            { returnDocument: 'after' }
+        )
+        await RequestsModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.requestId) },
+            { status: 'accepted' },
+            { returnDocument: 'after' }
+        )
+        res.status(200).send('ok')
     } catch (error) {
         res.status().send()
     }
@@ -212,7 +221,17 @@ app.post('/accept/managers', (req, res) => {
 
 app.post('/reject/managers', (req, res) => {
     try {
-        res.send('Hello World!')
+        await CourseModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { isViewable: true },
+            { returnDocument: 'after' }
+        )
+        await RequestsModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.requestId) },
+            { status: 'accepted' },
+            { returnDocument: 'after' }
+        )
+        res.status(200).send('ok')
 
     } catch (error) {
         res.status().send()
@@ -283,19 +302,36 @@ app.post('/request/to/add/course', async (req, res) => {
     }
 })
 
-app.delete('/accept/courses', (req, res) => {
+app.post('/accept/courses', (req, res) => {
     try {
-        res.send('Hello World!')
-
+        await CourseModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { isViewable: true },
+            { returnDocument: 'after' }
+        )
+        await RequestsModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.requestId) },
+            { status: 'accepted' },
+            { returnDocument: 'after' }
+        )
+        res.status(200).send('ok')
     } catch (error) {
         res.status().send()
     }
 })
 
-app.delete('/reject/courses', (req, res) => {
+app.post('/reject/courses', (req, res) => {
     try {
-        res.send('Hello World!')
-
+        await CourseModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { isViewable: false },
+            { returnDocument: 'after' }
+        )
+        await RequestsModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.requestId) },
+            { status: 'accepted' },
+            { returnDocument: 'after' }
+        )
     } catch (error) {
         res.status().send()
     }
