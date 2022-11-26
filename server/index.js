@@ -201,10 +201,10 @@ app.post('/request/to/make/managers', async (req, res) => {
     }
 })
 
-app.post('/accept/managers', (req, res) => {
+app.post('/accept/managers', async (req, res) => {
     try {
         await UserModal.findOneAndUpdate(
-            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { _id: mongoose.Types.ObjectId(req.body.userId) },
             { isManager: true },
             { returnDocument: 'after' }
         )
@@ -219,16 +219,16 @@ app.post('/accept/managers', (req, res) => {
     }
 })
 
-app.post('/reject/managers', (req, res) => {
+app.post('/reject/managers', async (req, res) => {
     try {
-        await CourseModal.findOneAndUpdate(
-            { _id: mongoose.Types.ObjectId(req.body.courseId) },
-            { isViewable: true },
+        await UserModal.findOneAndUpdate(
+            { _id: mongoose.Types.ObjectId(req.body.userId) },
+            { isManager: true },
             { returnDocument: 'after' }
         )
         await RequestsModal.findOneAndUpdate(
             { _id: mongoose.Types.ObjectId(req.body.requestId) },
-            { status: 'accepted' },
+            { status: 'reject' },
             { returnDocument: 'after' }
         )
         res.status(200).send('ok')
@@ -302,10 +302,10 @@ app.post('/request/to/add/course', async (req, res) => {
     }
 })
 
-app.post('/accept/courses', (req, res) => {
+app.post('/accept/courses', async (req, res) => {
     try {
         await CourseModal.findOneAndUpdate(
-            { _id: mongoose.Types.ObjectId(req.body.courseId) },
+            { _id: mongoose.Types.ObjectId(req.body.userId) },
             { isViewable: true },
             { returnDocument: 'after' }
         )
@@ -320,7 +320,7 @@ app.post('/accept/courses', (req, res) => {
     }
 })
 
-app.post('/reject/courses', (req, res) => {
+app.post('/reject/courses', async (req, res) => {
     try {
         await CourseModal.findOneAndUpdate(
             { _id: mongoose.Types.ObjectId(req.body.courseId) },
@@ -329,7 +329,7 @@ app.post('/reject/courses', (req, res) => {
         )
         await RequestsModal.findOneAndUpdate(
             { _id: mongoose.Types.ObjectId(req.body.requestId) },
-            { status: 'accepted' },
+            { status: 'reject' },
             { returnDocument: 'after' }
         )
     } catch (error) {
