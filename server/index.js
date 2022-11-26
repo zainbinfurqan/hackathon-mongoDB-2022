@@ -51,25 +51,50 @@ app.listen(port, () => {
 
 // _________________MODELS_______________//
 // ____________COURSE_______________//
-
-
 const courseSchema = new Schema({
     id: ObjectId,
     title: { type: String },
+    instructor: { type: String },
+    details: { type: String },
+    source: { type: String },
+    level: { type: String },
+    category: { type: String },
+    link: { type: String },
+    rating: { type: Number },
+    isViewable: { type: Boolean }
 });
 const CourseModal = mongoose.model('course', courseSchema);
-
 // ____________COURSE_______________//
 
-//______________________MANAGER___________________//
-
-const managerSchema = new Schema({
+//______________________REQUESTs___________________//
+const requestsSchema = new Schema({
     id: ObjectId,
-    title: { type: String },
+    requestQuery: { type: String },
+    status: { type: String },
+    responseQuery: { type: String },
+    courseId: { type: mongoose.Schema.Types.ObjectId, default: null },
+    requestedUserId: { type: mongoose.Schema.Types.ObjectId, },
 });
-const ManagerModal = mongoose.model('manager', managerSchema);
-//______________________MANAGER___________________//
+const RequestsModal = mongoose.model('request', requestsSchema);
+//______________________REQUESTs___________________//
+//______________________USER___________________//
+const userSchema = new Schema({
+    id: ObjectId,
+    fullName: { type: String },
+    email: { type: String },
+    password: { type: String },
+    isManager: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
+});
+const UserModal = mongoose.model('user', userSchema);
+//______________________USER___________________//
 // _________________MODELS_______________//
+
+
+// const manager = new ManagerModal;
+// const course = new CourseModal;
+// const user = new UserModal;
+// const request = new RequestsModal;
 
 //____________________________//
 //_____________AUTH  START_______________//
@@ -84,12 +109,7 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/signup', (req, res) => {
-    try {
-        res.send('Hello World!')
-
-    } catch (error) {
-        res.status().send()
-    }
+    try { } catch (error) { }
 })
 
 app.get('/guest/login', (req, res) => {
@@ -124,13 +144,13 @@ app.get('/search', (req, res) => {
 
 //____________MANAGER________________//
 
-app.get('/managers', (req, res) => {
+app.get('/managers', async (req, res) => {
     try {
         try {
-            res.send('Hello World!')
-
+            const managers = await UserModal.find({})
+            res.status(200).send(managers)
         } catch (error) {
-            res.status().send()
+            res.status(400).send()
         }
 
     } catch (error) {
@@ -140,11 +160,11 @@ app.get('/managers', (req, res) => {
 
 app.post('/managers', async (req, res) => {
     try {
-        const manager = new ManagerModal;
-        const newManager = await manager.save({ ...req.body })
+        console.log(req.body)
+        const newManager = await UserModal.create({ ...req.body, isManager: true })
         res.status(200).send(newManager)
     } catch (error) {
-        res.status().send()
+        res.status(400).send()
     }
 })
 
@@ -163,6 +183,21 @@ app.delete('/managers', (req, res) => {
 
     } catch (error) {
         res.status().send()
+    }
+})
+
+app.post('/request/to/make/managers', async (req, res) => {
+    try {
+        const requestPayload = {
+            requestQuery: "USer want to become manager",
+            status: 'pending',
+            responseQuery: '',
+            requestedUserId: mongoose.Types.ObjectId(req.body.userId)
+        }
+        const newRequest = await RequestsModal.create(requestPayload)
+        res.status(200).send(newRequest)
+    } catch (error) {
+        res.status(400).send()
     }
 })
 
@@ -188,20 +223,20 @@ app.post('/reject/managers', (req, res) => {
 //____________MANAGER________________//
 //____________COURSE________________//
 
-app.get('/courses', (req, res) => {
+app.get('/courses', async (req, res) => {
     try {
-        res.send('Hello World!')
-
+        const courses = await CourseModal.find({})
+        res.status(200).send(courses)
     } catch (error) {
-        res.status().send()
+        res.status(400).send()
     }
 })
 
 app.post('/courses', async (req, res) => {
     try {
         try {
-            const course = new CourseModal;
-            const newCourse = await course.save({ ...req.body })
+            req.body['isViewable'] = true
+            const newCourse = await CourseModal.create(req.body)
             res.status(200).send(newCourse)
         } catch (error) {
             console.log(error)
@@ -227,6 +262,24 @@ app.delete('/courses', (req, res) => {
 
     } catch (error) {
         res.status().send()
+    }
+})
+
+app.post('/request/to/add/course', async (req, res) => {
+    try {
+        req.body['isViewable'] = true
+        const newCourse = await CourseModal.create({ ...req.body, isViewable: false })
+        const requestPayload = {
+            requestQuery: "Manager want to add this course",
+            status: 'pending',
+            responseQuery: '',
+            courseId: newCourse._id,
+            requestedUserId: mongoose.Types.ObjectId(req.body.userId)
+        }
+        const newRequest = await RequestsModal.create(requestPayload)
+        res.status(200).send()
+    } catch (error) {
+        res.status(400).send()
     }
 })
 
