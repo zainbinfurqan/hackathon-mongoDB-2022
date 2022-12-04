@@ -3,9 +3,11 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
+const { Server } = require("socket.io");
 const app = express()
+const server = require('http').createServer(app);
 const port = 3001
+const io = new Server(server);
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -44,7 +46,7 @@ app.get('/', (req, res) => {
     }
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
 
@@ -99,17 +101,35 @@ const UserModal = mongoose.model('user', userSchema);
 //____________________________//
 //_____________AUTH  START_______________//
 
-app.get('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     try {
-        res.send('Hello World!')
 
+        const userFromDDB = await UserModal.findOne({ email: req.body.email, password: req.body.password })
+        if (userFromDDB) {
+            res.status(200).send(userFromDDB)
+        }
+        if (!userFromDDB) {
+            res.status(400).send("email or password not valid")
+        }
     } catch (error) {
-        res.status().send()
+        res.status().send(error)
     }
 })
 
-app.get('/signup', (req, res) => {
-    try { } catch (error) { }
+app.post('/signup', async (req, res) => {
+    try {
+        const isUserAlreadyExist = await UserModal.findOne({ email: req.body.email })
+        if (isUserAlreadyExist) {
+            res.status(400).send({ message: "user already exist" })
+        }
+        if (!isUserAlreadyExist) {
+            const newUser = await UserModal.create({ ...req.body })
+            res.status(200).send(newUser)
+        }
+    } catch (error) {
+        res.status(400).send(error)
+    }
+
 })
 
 app.get('/guest/login', (req, res) => {
@@ -127,11 +147,59 @@ app.get('/guest/login', (req, res) => {
 //_____________SEARCH START_______________//
 //____________________________//
 
-app.get('/search', (req, res) => {
+app.get('/search', async (req, res) => {
     try {
-        res.send('Hello World!')
-
+        const result = await CourseModal.aggregate([
+            {
+                '$search': {
+                    'index': 'search-text',
+                    'text': {
+                        'query': req.query.t,
+                        'path': {
+                            'wildcard': '*'
+                        }
+                    }
+                }
+            }
+        ])
+        console.log(result)
+        res.status(200).send(result)
     } catch (error) {
+        res.status().send()
+    }
+})
+
+app.get('/suggestion', async (req, res) => {
+    try {
+        const result = await CourseModal.aggregate([
+            {
+                '$search': {
+                    'index': 'autocomplete',
+                    'autocomplete': {
+                        'query': req.query.t,
+                        'path': 'title'
+                    },
+                    'highlight': {
+                        'path': [
+                            'title'
+                        ]
+                    }
+                }
+            }, {
+                '$limit': 5
+            }, {
+                '$project': {
+                    'title': 1,
+                    'highlights': {
+                        '$meta': 'searchHighlights'
+                    }
+                }
+            }
+        ])
+        console.log(result)
+        res.status(200).send(result)
+    } catch (error) {
+        console.log(error)
         res.status().send()
     }
 })
@@ -342,3 +410,60 @@ app.post('/reject/courses', async (req, res) => {
 //_____________ADMIN END_______________//
 //____________________________//
 
+
+
+// -----------Socket ------------------//
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    try {
+        socket.on('search-auto-suggest', async (data) => {
+            try {
+                const result = await CourseModal.aggregate([
+                    {
+                        '$search': {
+                            'index': 'autocomplete',
+                            'autocomplete': {
+                                'query': data.t,
+                                'path': 'title'
+                            },
+                            'highlight': {
+                                'path': [
+                                    'title'
+                                ]
+                            }
+                        }
+                    }, {
+                        '$limit': 5
+                    }, {
+                        '$project': {
+                            'title': 1,
+                            'highlights': {
+                                '$meta': 'searchHighlights'
+                            }
+                        }
+                    }
+                ])
+                const suggestions = []
+                if (result.length > 0) {
+                    result.map(item => {
+                        if (item.highlights.length > 0) {
+                            item.highlights.map(highlightsItem => {
+                                highlightsItem.texts.map(textsIte => {
+                                    suggestions.push(textsIte.value)
+                                })
+                            })
+                        }
+                    })
+                }
+                socket.emit('receive-suggestion', {
+                    data: suggestions
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        });
+    } catch (error) {
+        console.log(error)
+    }
+
+});

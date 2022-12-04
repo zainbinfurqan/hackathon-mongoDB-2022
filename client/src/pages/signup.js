@@ -33,10 +33,11 @@ function SignUp(props) {
                                 <div class="flex items-center justify-between">
                                     <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
                                 </div>
-                                <h1 class="text-xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                    Signup as guest
-                                </h1>
                                 <Button onClick={handleSignUp} title="SIGN UP" />
+                                <h1 class="text-xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                                    OR
+                                </h1>
+                                <Button onClick={handleSignUp} title="SIGN UP AS GUEST" />
                                 <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                                     <Link to="/login">Already have a account?
                                         <span class="font-medium text-primary-600 hover:underline dark:text-primary-500"> Login</span>
