@@ -4,6 +4,7 @@ import Routing from './routes';
 import { BrowserRouter } from "react-router-dom";
 import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
+import AppProvider from './context/appProvider';
 
 const socket = io('ws://localhost:3001/', { transports: ['websocket'] });
 
@@ -20,9 +21,11 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Routing />
-    </BrowserRouter>
+    <AppProvider>
+      <BrowserRouter>
+        <Routing />
+      </BrowserRouter>
+    </AppProvider>
   );
 }
 

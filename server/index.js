@@ -149,12 +149,13 @@ app.get('/guest/login', (req, res) => {
 
 app.get('/search', async (req, res) => {
     try {
+        console.log(req.query.t)
         const result = await CourseModal.aggregate([
             {
                 '$search': {
                     'index': 'search-text',
                     'text': {
-                        'query': req.query.t,
+                        'query': req.query.t == '' ? '' : req.query.t,
                         'path': {
                             'wildcard': '*'
                         }
@@ -165,7 +166,8 @@ app.get('/search', async (req, res) => {
         console.log(result)
         res.status(200).send(result)
     } catch (error) {
-        res.status().send()
+        console.log(error)
+        res.status(400).send()
     }
 })
 
@@ -176,7 +178,7 @@ app.get('/suggestion', async (req, res) => {
                 '$search': {
                     'index': 'autocomplete',
                     'autocomplete': {
-                        'query': req.query.t,
+                        'query': req.query.t == '' ? '' : req.query.t,
                         'path': 'title'
                     },
                     'highlight': {
