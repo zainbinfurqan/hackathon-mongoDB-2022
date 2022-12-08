@@ -35,7 +35,8 @@ const initialState = {
     loading: false,
     browseCourses: [],
     managers: [],
-    courses: []
+    courses: [],
+    auth: {},
 }
 
 const reducer = (state, action) => {
