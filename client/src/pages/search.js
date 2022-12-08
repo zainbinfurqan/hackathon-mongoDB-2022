@@ -24,7 +24,8 @@ function Search(props) {
 
     const eventLS = () => {
         socket.on('receive-suggestion', (data) => {
-            data.length > 0 && setSuggestedSearchText(data.data)
+            console.log(data)
+            data.data.length > 0 && setSuggestedSearchText(data.data)
         })
     }
 
@@ -50,7 +51,7 @@ function Search(props) {
     useEffect(() => {
         fetchCourses()
     }, [])
-    console.log("browseCourses", browseCourses)
+    console.log("suggestedSearchText", suggestedSearchText)
     return (
         <div className='p-2'>
             <SearchBar

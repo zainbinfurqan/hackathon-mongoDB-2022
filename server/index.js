@@ -457,6 +457,7 @@ io.on('connection', (socket) => {
                         }
                     })
                 }
+                console.log(suggestions)
                 socket.emit('receive-suggestion', {
                     data: suggestions
                 })
